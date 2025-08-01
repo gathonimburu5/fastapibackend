@@ -21,3 +21,9 @@ app.add_middleware(
 
 from application.controllers.employee_controller import employee_router
 app.include_router(employee_router, prefix="/api", tags=["Employees"])
+
+from application.controllers.customer_controller import customer_router
+app.include_router(customer_router, prefix="/api", tags=["Customers"])
+
+from application.controllers.product_controller import product_router
+app.include_router(product_router, prefix="/api", tags=["Products"])
