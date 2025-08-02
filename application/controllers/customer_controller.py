@@ -1,18 +1,12 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from application.config import SessionLocal
 from fastapi.responses import JSONResponse
 from application.schemas.employee_schema import CustomerCreate, CustomerOut
 from application.services.customer_service import CustomerService
+from application.config import get_db
 
 customer_router = APIRouter()
 customerService = CustomerService()
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @customer_router.get("/customers", response_model=list[CustomerOut])
 def get_customers(db: Session = Depends(get_db)):

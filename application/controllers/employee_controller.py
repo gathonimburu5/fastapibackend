@@ -4,15 +4,10 @@ from application.config import SessionLocal
 from application.schemas.employee_schema import EmployeeCreate, EmployeeOut
 from application.services.employee_service import EmployeeService
 from fastapi.responses import JSONResponse
+from application.config import get_db
 
 employee_router = APIRouter()
 employeeService = EmployeeService()
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @employee_router.get("/employees", response_model=list[EmployeeOut])
 def get_employees(db: Session = Depends(get_db)):

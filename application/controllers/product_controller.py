@@ -4,15 +4,10 @@ from application.config import SessionLocal
 from fastapi.responses import JSONResponse
 from application.schemas.product_schema import ProductCreate, ProductOut, CategoryCreate, CategoryOut, MeasurementUnitCreate, MeasurementUnitOut, WarehouseCreate, WarehouseOut, TaxCreate, TaxOut
 from application.services.product_service import ProductService
+from application.config import get_db
 
 product_router = APIRouter()
 productService = ProductService()
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @product_router.get("/products", response_model=list[ProductOut])
 def get_products(db: Session = Depends(get_db)):

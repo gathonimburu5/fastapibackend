@@ -27,3 +27,6 @@ app.include_router(customer_router, prefix="/api", tags=["Customers"])
 
 from application.controllers.product_controller import product_router
 app.include_router(product_router, prefix="/api", tags=["Products"])
+
+from application.controllers.authentication_controller import authentication_router
+app.include_router(authentication_router, prefix="/api", tags=["Authentication"])
