@@ -4,7 +4,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from fastapi.security import OAuth2PasswordBearer
 
 load_dotenv()
 
@@ -25,7 +24,7 @@ engine = create_engine(DB_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 def get_db():
     db = SessionLocal()

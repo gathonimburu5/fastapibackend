@@ -20,4 +20,12 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     if not user_record:
         return JSONResponse(content={"error": "invalid credentials", "code": status.HTTP_401_UNAUTHORIZED}, status_code=status.HTTP_401_UNAUTHORIZED)
     access_token = create_access_token(data={"sub": user_record.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "id": user_record.id, 
+        "full_name": user_record.full_name, 
+        "email_address": user_record.email_address, 
+        "phone_number": user_record.phone_number, 
+        "username": user_record.username
+    }

@@ -19,5 +19,10 @@ class UserLogin(BaseModel):
 class UserToken(BaseModel):
     access_token: str
     token_type: str
+    id: int
+    full_name: str
+    email_address: EmailStr
+    phone_number: str
+    username: str
 
 
