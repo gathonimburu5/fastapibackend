@@ -10,9 +10,9 @@ from application.utility.token import get_current_user
 employee_router = APIRouter()
 employeeService = EmployeeService()
 
-@employee_router.get("/employees", response_model=list[EmployeeOut], dependencies=[Depends(get_current_user)])
-def get_employees(db: Session = Depends(get_db)):
-    return employeeService.getAllEmployee(db)
+@employee_router.get("/employees", response_model=list[EmployeeOut])
+def get_employees(db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
+    return employeeService.getAllEmployee(db, current_user)
 
 @employee_router.post("/employees", response_model=EmployeeOut, dependencies=[Depends(get_current_user)])
 def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):

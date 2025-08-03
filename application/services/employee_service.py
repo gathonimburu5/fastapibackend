@@ -24,7 +24,7 @@ class EmployeeService:
         db.refresh(new_employee)
         return new_employee
 
-    def getAllEmployee(self, db: Session):
+    def getAllEmployee(self, db: Session, current_user):
         return db.query(Employee).all()
 
     def getEmployeeById(self, employee_id: int, db: Session):
