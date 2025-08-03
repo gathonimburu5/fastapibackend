@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
 
-class UserBase(BaseModel):
+class UserCreate(BaseModel):
     id: int
     full_name: str
     email_address: EmailStr
@@ -10,20 +10,14 @@ class UserBase(BaseModel):
     password: str
     date_of_birth: date
     profile_picture: str | None = None
-    status: str = "active"
+    status: str
 
 class UserLogin(BaseModel):
     username: str
     password: str
 
-class UserCreate(UserBase):
-    pass
+class UserToken(BaseModel):
+    access_token: str
+    token_type: str
 
-class UserOut(UserBase):
-    id: int
-    full_name: str
-    email_address: EmailStr
-
-    class Config:
-        orm_mode = True
 

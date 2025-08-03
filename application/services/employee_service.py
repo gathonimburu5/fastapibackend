@@ -3,7 +3,8 @@ from application.models.employee_model import Employee, Customer
 from application.schemas.employee_schema import EmployeeCreate, CustomerCreate
 
 class EmployeeService:
-    def createEmployeeService(self, employee: EmployeeCreate, db: Session):
+    def createEmployeeService(self, employee: EmployeeCreate, db: Session, current_user):
+        user_id = current_user.id
         new_employee = Employee(
             employee_name=employee.employee_name,
             email_address=employee.email_address,
@@ -15,7 +16,8 @@ class EmployeeService:
             date_of_joining=employee.date_of_joining,
             physical_address=employee.physical_address,
             designation=employee.designation,
-            salary=employee.salary
+            salary=employee.salary,
+            created_by=user_id
         )
         db.add(new_employee)
         db.commit()

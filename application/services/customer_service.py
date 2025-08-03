@@ -3,7 +3,8 @@ from application.models.employee_model import Customer
 from application.schemas.employee_schema import CustomerCreate
 
 class CustomerService:
-    def createCustomerService(self, customer: CustomerCreate, db: Session):
+    def createCustomerService(self, customer: CustomerCreate, db: Session, current_user):
+        user_id = current_user.id
         new_customer = Customer(
             customer_name=customer.customer_name,
             email_address=customer.email_address,
@@ -19,7 +20,8 @@ class CustomerService:
             opening_balance=customer.opening_balance,
             opening_balance_date=customer.opening_balance_date,
             opening_balance_rate=customer.opening_balance_rate,
-            currency_id=customer.currency_id
+            currency_id=customer.currency_id,
+            created_by=user_id
         )
         db.add(new_customer)
         db.commit()

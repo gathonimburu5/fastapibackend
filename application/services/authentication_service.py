@@ -1,11 +1,8 @@
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from application.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, oauth2_scheme
 from application.models.user_model import Signup
 from application.utility.security import hash_password, verify_password
-from application.schemas.user_schema import UserCreate, UserLogin
-from fastapi import HTTPException, status, Depends
+from application.schemas.user_schema import UserCreate
+from fastapi import HTTPException, status
 
 class AuthenticationService:
     def create_user(self, user: UserCreate, db: Session):
@@ -33,39 +30,44 @@ class AuthenticationService:
         if not user or not verify_password(password, user.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
         return user
+    
+    
+    
+    # Uncomment if you need to implement token creation and user retrieval in this service
+    # from application.utility.token import create_access_token, get_current_user
 
-    def create_access_token(self, data: dict, expires_delta: timedelta | None = None):
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return encoded_jwt
+    # def create_access_token(self, data: dict, expires_delta: timedelta | None = None):
+    #     to_encode = data.copy()
+    #     if expires_delta:
+    #         expire = datetime.utcnow() + expires_delta
+    #     else:
+    #         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    #     to_encode.update({"exp": expire})
+    #     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    #     return encoded_jwt
 
-    def get_current_user(self, db: Session, token: str = Depends(oauth2_scheme)):
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            username: str = payload.get("sub")
-            if username is None:
-                raise credentials_exception
-        except JWTError:
-            raise credentials_exception
-        user = db.query(Signup).filter(Signup.username == username).first()
-        if user is None:
-            raise credentials_exception
-        return user
+    # def get_current_user(self, db: Session, token: str = Depends(oauth2_scheme)):
+    #     credentials_exception = HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Could not validate credentials",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
+    #     try:
+    #         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    #         username: str = payload.get("sub")
+    #         if username is None:
+    #             raise credentials_exception
+    #     except JWTError:
+    #         raise credentials_exception
+    #     user = db.query(Signup).filter(Signup.username == username).first()
+    #     if user is None:
+    #         raise credentials_exception
+    #     return user
 
-    def login_user(self, db: Session, user_login: UserLogin):
-        user = self.authenticate_user(db, user_login.username, user_login.password)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = self.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-        return {"access_token": access_token, "token_type": "bearer", "user": user}
+    # def login_user(self, db: Session, user_login: UserLogin):
+    #     user = self.authenticate_user(db, user_login.username, user_login.password)
+    #     if not user:
+    #         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    #     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    #     access_token = self.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+    #     return {"access_token": access_token, "token_type": "bearer", "user": user}

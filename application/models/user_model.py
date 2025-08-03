@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from application.config import Base
 
 class Signup(Base):
-    __tablename__ = 'signups'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, nullable=False)

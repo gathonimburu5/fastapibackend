@@ -16,8 +16,10 @@ class Employee(Base):
     date_of_joining = Column(DateTime, nullable=False)
     physical_address = Column(String, nullable=False)
     designation = Column(String, nullable=False)
-    salary = Column(Float, nullable=True)
+    salary = Column(Float, nullable=false, default=0.0)
+    status = Column(String, default="active", nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(String, nullable=False)
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -31,11 +33,12 @@ class Customer(Base):
     date_of_birth = Column(DateTime, nullable=False)
     date_of_registration = Column(DateTime, nullable=False)
     vat_pin = Column(String, unique=True, index=True, nullable=False)
-    credit_limit = Column(Float, nullable=True)
-    sales_rep_id = Column(Integer, nullable=True)
+    credit_limit = Column(Float, nullable=false)
+    sales_rep_id = Column(Integer, nullable=false)
     status = Column(String, default="active", nullable=False)
     opening_balance = Column(Float, default=0.0, nullable=False)
     opening_balance_date = Column(DateTime, nullable=True)
     opening_balance_rate = Column(Float, default=0.0, nullable=False)
-    currency_id = Column(Integer, nullable=True)
+    currency_id = Column(Integer, nullable=false)
     created_on = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(String, nullable=False)
