@@ -23,7 +23,7 @@ class Product(Base):
     tax_id = Column(Integer, nullable=False)
     warehouse_id = Column(Integer, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(String, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class Category(Base):
     __tablename__ = 'categories'
@@ -33,7 +33,7 @@ class Category(Base):
     status = Column(String, default="active", nullable=False)
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(String, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class MeasurementUnit(Base):
     __tablename__ = 'measurement_units'
@@ -43,7 +43,7 @@ class MeasurementUnit(Base):
     status = Column(String, default="active", nullable=False)
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(String, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class Warehouse(Base):
     __tablename__ = 'warehouses'
@@ -59,7 +59,7 @@ class Warehouse(Base):
     warehouse_stage = Column(String, nullable=False)
     quantity = Column(Integer, default=0, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(String, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class Tax(Base):
     __tablename__ = 'taxes'
@@ -71,4 +71,29 @@ class Tax(Base):
     status = Column(String, default="active", nullable=False)
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(String, nullable=False)
+    created_by = Column(Integer, nullable=False)
+
+
+class RequestHeader(Base):
+    __tablename__ = 'request_header'
+
+    id = Column(Integer, primary_key=True, index=True)
+    request_description = Column(String, nullable=False)
+    request_date = Column(DateTime, nullable=False)
+    request_status = Column(String, default="PENDING", nullable=False)
+    request_type = Column(String, nullable=False)
+    created_on = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(Integer, nullable=False)
+
+class RequestDetail(Base):
+    __tablename__ = 'request_detail'
+
+    id = Column(Integer, primary_key=True, index=True)
+    header_id = Column(Integer, nullable=False)
+    product_id = Column(Integer, nullable=False)
+    quantity = Column(Integer, default=0.0, nullable=False)
+    unit_price = Column(Float, default=0.0, nullable=False)
+    net_price = Column(Float, default=0.0, nullable=False)
+    more_detail = Column(String, nullable=True)
+    vat_id = Column(Integer, nullable=False)
+    vat_amount = Column(Float, default=0.0, nullable=False)

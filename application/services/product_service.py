@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
-from application.models.product_model import Product, Category, MeasurementUnit, Warehouse, Tax
-from application.schemas.product_schema import ProductCreate, CategoryCreate, MeasurementUnitCreate, WarehouseCreate, TaxCreate
+from application.models.product_model import Product, Category, MeasurementUnit, Warehouse, Tax, RequestHeader, RequestDetail
+from application.schemas.product_schema import ProductCreate, CategoryCreate, MeasurementUnitCreate, WarehouseCreate, TaxCreate, RequestHeaderCreate
 
 class ProductService:
     def getAllProductRecords(self, db: Session):
         return db.query(Product).all()
 
-    def createProductRecord(self, product: ProductCreate, db: Session):
+    def createProductRecord(self, product: ProductCreate, db: Session, current_user):
+        user_id = current_user.id
         new_product = Product(
             product_code=product.product_code,
             product_name=product.product_name,
@@ -23,7 +24,8 @@ class ProductService:
             product_image=product.product_image,
             nonstock_item=product.non_stock_item,
             tax_id=product.tax_id,
-            warehouse_id=product.warehouse_id
+            warehouse_id=product.warehouse_id,
+            created_by = user_id
         )
         db.add(new_product)
         db.commit()
@@ -71,11 +73,13 @@ class ProductService:
     def getAllCategories(self, db: Session):
         return db.query(Category).all()
 
-    def createCategory(self, category: CategoryCreate, db: Session):
+    def createCategory(self, category: CategoryCreate, db: Session, current_user):
+        user_id = current_user.id
         new_category = Category(
             category_name=category.category_name,
             status=category.status,
-            description=category.description
+            description=category.description,
+            created_by = user_id
         )
         db.add(new_category)
         db.commit()
@@ -110,11 +114,13 @@ class ProductService:
     def getAllMeasurementUnits(self, db: Session):
         return db.query(MeasurementUnit).all()
 
-    def createMeasurementUnit(self, unit: MeasurementUnitCreate, db: Session):
+    def createMeasurementUnit(self, unit: MeasurementUnitCreate, db: Session, current_user):
+        user_id = current_user.id
         new_unit = MeasurementUnit(
             unit_name=unit.unit_name,
             status=unit.status,
-            description=unit.description
+            description=unit.description,
+            created_by = user_id
         )
         db.add(new_unit)
         db.commit()
@@ -149,7 +155,8 @@ class ProductService:
     def getAllWarehouses(self, db: Session):
         return db.query(Warehouse).all()
 
-    def createWarehouse(self, warehouse: WarehouseCreate, db: Session):
+    def createWarehouse(self, warehouse: WarehouseCreate, db: Session, current_user):
+        user_id = current_user.id
         new_warehouse = Warehouse(
             warehouse_code=warehouse.warehouse_code,
             warehouse_name=warehouse.warehouse_name,
@@ -159,7 +166,8 @@ class ProductService:
             warehouse_type=warehouse.warehouse_type,
             warehouse_address=warehouse.warehouse_address,
             warehouse_stage=warehouse.warehouse_stage,
-            quantity=warehouse.quantity
+            quantity=warehouse.quantity,
+            created_by = user_id
         )
         db.add(new_warehouse)
         db.commit()
@@ -200,13 +208,15 @@ class ProductService:
     def getAllTaxes(self, db: Session):
         return db.query(Tax).all()
 
-    def createTax(self, tax: TaxCreate, db: Session):
+    def createTax(self, tax: TaxCreate, db: Session, current_user):
+        user_id = current_user.id
         new_tax = Tax(
             tax_code=tax.tax_code,
             tax_name=tax.tax_name,
             tax_rate=tax.tax_rate,
             status=tax.status,
-            description=tax.description
+            description=tax.description,
+            created_by = user_id
         )
         db.add(new_tax)
         db.commit()
@@ -231,3 +241,30 @@ class ProductService:
         db.commit()
         db.refresh(tax_record)
         return tax_record
+    def createRequest(self, request: RequestHeaderCreate, db: Session, current_user):
+        user_id = current_user.id
+        new_request = RequestHeader(
+            request_description = request.request_description,
+            request_date = request.request_date,
+            request_type = request.request_type,
+            created_by = user_id
+        )
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+
+        for detail in request.details:
+            new_detail = RequestDetail(
+                header_id = new_request.id,
+                product_id = detail.product_id,
+                quantity = detail.quantity,
+                unit_price = detail.unit_price,
+                net_price = detail.net_price,
+                more_detail = detail.more_detail,
+                vat_id = detail.vat_id,
+                vat_amount = detail.vat_amount
+            )
+            db.add(new_detail)
+
+        db.commit()
+        return new_request

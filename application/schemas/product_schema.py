@@ -85,3 +85,47 @@ class TaxOut(TaxBase):
     id: int
     class Config:
         orm_mode = True
+
+class RequestDetailCreate(BaseModel):
+    id: int
+    header_id: int
+    product_id: int
+    quantity: int
+    unit_price: float
+    net_price: float
+    more_detail: str
+    vat_id: int
+    vat_amount: float
+
+class RequestHeaderCreate(BaseModel):
+    id: int
+    request_description: str
+    request_date: date
+    request_status: str
+    request_type: str
+    details: list[RequestDetailCreate]
+
+class RequestDetailOut(BaseModel):
+    id: int
+    header_id: int
+    product_id: int
+    quantity: int
+    unit_price: float
+    net_price: float
+    more_detail: str
+    vat_id: int
+    vat_amount: float
+
+    class confif:
+        orm_mode = True
+
+class RequestHeaderOut(BaseModel):
+    id: int
+    request_description: str
+    request_date: date
+    request_status: str
+    request_type: str
+    details: list[RequestDetailCreate] = []
+
+    class config:
+        orm_mode = True
