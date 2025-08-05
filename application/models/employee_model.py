@@ -19,7 +19,7 @@ class Employee(Base):
     salary = Column(Float, nullable=False, default=0.0)
     status = Column(String, default="active", nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(int, nullable=False)
+    created_by = Column(Integer, nullable=False)
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -41,4 +41,4 @@ class Customer(Base):
     opening_balance_rate = Column(Float, default=0.0, nullable=False)
     currency_id = Column(Integer, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
-    created_by = Column(int, nullable=False)
+    created_by = Column(Integer, nullable=False)
