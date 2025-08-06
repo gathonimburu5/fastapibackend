@@ -116,7 +116,7 @@ class RequestDetailOut(BaseModel):
     vat_id: int
     vat_amount: float
 
-    class confif:
+    class Confif:
         orm_mode = True
 
 class RequestHeaderOut(BaseModel):
@@ -127,5 +127,5 @@ class RequestHeaderOut(BaseModel):
     request_type: str
     details: list[RequestDetailCreate] = []
 
-    class config:
+    class Config:
         orm_mode = True

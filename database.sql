@@ -125,3 +125,27 @@ CREATE TABLE "public"."customers" (
   "created_by" int4,
   CONSTRAINT "customers_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "public"."request_header" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "request_description" varchar(255),
+  "request_date" date,
+  "request_status" varchar(20) DEFAULT 'PENDING',
+  "request_type" varchar(100),
+  "created_on" date,
+  "created_by" int4,
+  CONSTRAINT "request_header_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."request_detail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "header_id" int4,
+  "product_id" int4,
+  "more_detail" varchar(255),
+  "quantity" int4,
+  "unit_price" numeric(10, 2) DEFAULT 0.00,
+  "net_price" numeric(10, 2) DEFAULT 0.00,
+  "vat_id" int4,
+  "vat_amount" numeric(10, 2) DEFAULT 0.00,
+  CONSTRAINT "request_detail_pkey" PRIMARY KEY ("id")
+);
