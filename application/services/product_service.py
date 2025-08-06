@@ -268,3 +268,28 @@ class ProductService:
 
         db.commit()
         return new_request
+
+    def getAllRequest(self, db: Session):
+        #return db.query(RequestHeader, RequestDetail).join(RequestDetail, RequestDetail.header_id == RequestHeader.id).all()
+        header_result = db.query(RequestHeader).all()
+        detail_request = db.query(RequestDetail).all()
+
+        header_mapper = {header.id: [] for header in header_result}
+        for detail in detail_request:
+            if detail.header_id in request_results:
+                #request_results[detail.header_id].details.append(detail)
+                header_mapper[detail.header_id].append(detail)
+
+        request_results = []
+        for header in header_result:
+            header_result = {
+                "id": header.id,
+                "request_description": header.request_description,
+                "request_status": header.request_status,
+                "request_type": header.request_type,
+                "request_date": header.request_date,
+                "details": header_mapper.get(header.id, [])
+            }
+            request_results.append(header_result)
+
+        return request_results

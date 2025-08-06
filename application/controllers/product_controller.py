@@ -126,6 +126,10 @@ def update_tax(tax_id: int, tax: TaxCreate, db: Session = Depends(get_db), curre
         return JSONResponse(content={"error": "tax record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated tax record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)
 
+@product_router.get("/requests", response_model=list[RequestHeaderOut])
+def get_requests(db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
+    return productService.getAllRequest(db)
+
 @product_router.post("/requests", response_model=RequestHeaderOut)
 def create_request(request: RequestHeaderCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
     productService.createRequest(request, db, current_user)
