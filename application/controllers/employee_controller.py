@@ -29,7 +29,7 @@ def get_employee(employee_id: int, db: Session = Depends(get_db), current_user: 
 
 @employee_router.put("/employees/{employee_id}", response_model=EmployeeOut)
 def update_employee(employee_id: int, employee: EmployeeCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    employee_record = employeeService.updateEmployeeService(employee_id, employee, db)
+    employee_record = employeeService.updateEmployeeService(employee_id, employee, db, current_user)
     if not employee_record:
         return JSONResponse(content={"error": "employee record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated employee record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)

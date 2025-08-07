@@ -29,7 +29,7 @@ def get_product(product_id: int, db: Session = Depends(get_db), current_user: Us
 
 @product_router.put("/products/{product_id}", response_model=ProductOut)
 def update_product(product_id: int, product: ProductCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    product_record = productService.updateProductRecord(product_id, product, db)
+    product_record = productService.updateProductRecord(product_id, product, db, current_user)
     if not product_record:
         return JSONResponse(content={"error": "product record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated product record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)
@@ -52,7 +52,7 @@ def get_category(category_id: int, db: Session = Depends(get_db), current_user: 
 
 @product_router.put("/categories/{category_id}", response_model=CategoryOut)
 def update_category(category_id: int, category: CategoryCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    category_record = productService.updateCategory(category_id, category, db)
+    category_record = productService.updateCategory(category_id, category, db, current_user)
     if not category_record:
         return JSONResponse(content={"error": "category record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated category record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)

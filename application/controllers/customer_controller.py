@@ -29,7 +29,7 @@ def get_customer(customer_id: int, db: Session = Depends(get_db), current_user: 
 
 @customer_router.put("/customers/{customer_id}", response_model=CustomerOut)
 def update_customer(customer_id: int, customer: CustomerCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    customer_record = customerService.updateCustomerService(customer_id, customer, db)
+    customer_record = customerService.updateCustomerService(customer_id, customer, db, current_user)
     if not customer_record:
         return JSONResponse(content={"error": "customer record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated customer record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)

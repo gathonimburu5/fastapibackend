@@ -8,59 +8,63 @@ class ProductService:
         return db.query(Product).all()
 
     def createProductRecord(self, product: ProductCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_product = Product(
-            product_code=product.product_code,
-            product_name=product.product_name,
-            product_type=product.product_type,
-            description=product.description,
-            buy_price=product.buy_price,
-            sell_price=product.sell_price,
-            quantity_per_unit=product.quantity_per_unit,
-            quantity=product.quantity,
-            category_id=product.category_id,
-            supplier_id=product.supplier_id,
-            unit_id=product.unit_id,
-            reoder_level=product.reorder_level,
-            product_image=product.product_image,
-            nonstock_item=product.non_stock_item,
-            tax_id=product.tax_id,
-            warehouse_id=product.warehouse_id,
-            created_by = user_id
-        )
-        db.add(new_product)
-        db.flush(new_product)
-        db.commit()
-        db.refresh(new_product)
+        try:
+            user_id = current_user.id
+            new_product = Product(
+                product_code=product.product_code,
+                product_name=product.product_name,
+                product_type=product.product_type,
+                description=product.description,
+                buy_price=product.buy_price,
+                sell_price=product.sell_price,
+                quantity_per_unit=product.quantity_per_unit,
+                quantity=product.quantity,
+                category_id=product.category_id,
+                supplier_id=product.supplier_id,
+                unit_id=product.unit_id,
+                reoder_level=product.reorder_level,
+                product_image=product.product_image,
+                nonstock_item=product.non_stock_item,
+                tax_id=product.tax_id,
+                warehouse_id=product.warehouse_id,
+                created_by = user_id
+            )
+            db.add(new_product)
+            db.flush(new_product)
 
-        # create product movement
-        openQ = new_product.quantity
-        issueQ = 0
-        receiveQ = 0
-        adjQ = 0
-        phyQ = (openQ + issueQ + receiveQ + adjQ)
-        product_movement = ProductMovement(
-            product_id = new_product.id,
-            open_stock = openQ,
-            issued_qty = issueQ,
-            received_qty = receiveQ,
-            adjusted_qty = adjQ,
-            physical_qty = phyQ,
-            transaction_name = "",
-            created_by = user_id
-        )
-        db.add(product_movement)
+            # create product movement
+            openQ = new_product.quantity
+            issueQ = 0
+            receiveQ = 0
+            adjQ = 0
+            phyQ = (openQ + issueQ + receiveQ + adjQ)
+            product_movement = ProductMovement(
+                product_id = new_product.id,
+                open_stock = openQ,
+                issued_qty = issueQ,
+                received_qty = receiveQ,
+                adjusted_qty = adjQ,
+                physical_qty = phyQ,
+                transaction_name = "",
+                created_by = user_id
+            )
+            db.add(product_movement)
 
-        # create audit trail
-        create_trail = AuditTrail(
-            module_id = new_product.id,
-            module_name = "PostProductRecord",
-            action_taken = "CREATING PRODUCT RECORD",
-            user_id = user_id
-        )
-        db.add(create_trail)
-        db.commit()
-        return new_product
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_product.id,
+                module_name = "PostProductRecord",
+                action_taken = "CREATING PRODUCT RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(new_product)
+            return new_product
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getProductById(self, product_id: int, db: Session):
         product_record = db.query(Product).filter(Product.id == product_id).first()
@@ -68,29 +72,68 @@ class ProductService:
             return product_record
         return None
 
-    def updateProductRecord(self, product_id: int, product: ProductCreate, db: Session):
-        product_record = db.query(Product).filter(Product.id == product_id).first()
-        if not product_record:
-            return None
-        product_record.product_code = product.product_code
-        product_record.product_name = product.product_name
-        product_record.product_type = product.product_type
-        product_record.description = product.description
-        product_record.buy_price = product.buy_price
-        product_record.sell_price = product.sell_price
-        product_record.quantity_per_unit = product.quantity_per_unit
-        product_record.quantity = product.quantity
-        product_record.category_id = product.category_id
-        product_record.supplier_id = product.supplier_id
-        product_record.unit_id = product.unit_id
-        product_record.reorder_level = product.reorder_level
-        product_record.product_image = product.product_image
-        product_record.non_stock_item = product.non_stock_item
-        product_record.tax_id = product.tax_id
-        product_record.warehouse_id = product.warehouse_id
-        db.commit()
-        db.refresh(product_record)
-        return product_record
+    def updateProductRecord(self, product_id: int, product: ProductCreate, db: Session, current_user):
+        try:
+            userId = current_user.id
+            product_record = db.query(Product).filter(Product.id == product_id).first()
+            if not product_record:
+                return None
+
+            #getting original quantity
+            original_qty = product_record.quantity
+
+            product_record.product_code = product.product_code
+            product_record.product_name = product.product_name
+            product_record.product_type = product.product_type
+            product_record.description = product.description
+            product_record.buy_price = product.buy_price
+            product_record.sell_price = product.sell_price
+            product_record.quantity_per_unit = product.quantity_per_unit
+            product_record.quantity = product.quantity
+            product_record.category_id = product.category_id
+            product_record.supplier_id = product.supplier_id
+            product_record.unit_id = product.unit_id
+            product_record.reorder_level = product.reorder_level
+            product_record.product_image = product.product_image
+            product_record.non_stock_item = product.non_stock_item
+            product_record.tax_id = product.tax_id
+            product_record.warehouse_id = product.warehouse_id
+            db.commit()
+
+            # create product movement
+            openQ = original_qty
+            newQ = product.quantity
+            issueQ = 0
+            receiveQ = 0
+            adjQ = (newQ - openQ)
+            phyQ = (openQ + issueQ + receiveQ + adjQ)
+            product_movement = ProductMovement(
+                product_id = product_record.id,
+                open_stock = openQ,
+                issued_qty = issueQ,
+                received_qty = receiveQ,
+                adjusted_qty = adjQ,
+                physical_qty = phyQ,
+                transaction_name = "",
+                created_by = userId
+            )
+            db.add(product_movement)
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = product_record.id,
+                module_name = "UpdateProductRecord",
+                action_taken = "UPDATE PRODUCT RECORD",
+                user_id = userId
+            )
+            db.add(create_trail)
+
+            db.refresh(product_record)
+            db.commit()
+            return product_record
+        except Exception as e:
+            db.rollback()
+            return f"failed to update product detail: {str(e)}"
 
     def deleteProductRecord(self, product_id: int, db: Session):
         product_record = db.query(Product).filter(Product.id == product_id).first()
@@ -104,17 +147,32 @@ class ProductService:
         return db.query(Category).all()
 
     def createCategory(self, category: CategoryCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_category = Category(
-            category_name=category.category_name,
-            status=category.status,
-            description=category.description,
-            created_by = user_id
-        )
-        db.add(new_category)
-        db.commit()
-        db.refresh(new_category)
-        return new_category
+        try:
+            user_id = current_user.id
+            new_category = Category(
+                category_name=category.category_name,
+                status=category.status,
+                description=category.description,
+                created_by = user_id
+            )
+            db.add(new_category)
+            db.flush(new_category)
+            
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_category.id,
+                module_name = "PostCategoryRecord",
+                action_taken = "CREATING CATEGORY RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(new_category)
+            return new_category
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getCategoryById(self, category_id: int, db: Session):
         category_record = db.query(Category).filter(Category.id == category_id).first()
@@ -122,16 +180,31 @@ class ProductService:
             return category_record
         return None
 
-    def updateCategory(self, category_id: int, category: CategoryCreate, db: Session):
-        category_record = db.query(Category).filter(Category.id == category_id).first()
-        if not category_record:
-            return None
-        category_record.category_name = category.category_name
-        category_record.status = category.status
-        category_record.description = category.description
-        db.commit()
-        db.refresh(category_record)
-        return category_record
+    def updateCategory(self, category_id: int, category: CategoryCreate, db: Session, current_user):
+        try:
+            userId = current_user.id
+            category_record = db.query(Category).filter(Category.id == category_id).first()
+            if not category_record:
+                return None
+            category_record.category_name = category.category_name
+            category_record.status = category.status
+            category_record.description = category.description
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = category_id.id,
+                module_name = "UpdateCategoryRecord",
+                action_taken = "UPDATING CATEGORY RECORD",
+                user_id = userId
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(category_record)
+            return category_record
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def deleteCategory(self, category_id: int, db: Session):
         category_record = db.query(Category).filter(Category.id == category_id).first()
