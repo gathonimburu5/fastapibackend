@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from application.models.product_model import Product, Category, MeasurementUnit, Warehouse, Tax, RequestHeader, RequestDetail
 from application.schemas.product_schema import ProductCreate, CategoryCreate, MeasurementUnitCreate, WarehouseCreate, TaxCreate, RequestHeaderCreate
+from application.models.trail_model import AuditTrail, ProductMovement
 
 class ProductService:
     def getAllProductRecords(self, db: Session):
@@ -28,8 +29,37 @@ class ProductService:
             created_by = user_id
         )
         db.add(new_product)
+        db.flush(new_product)
         db.commit()
         db.refresh(new_product)
+
+        # create product movement
+        openQ = new_product.quantity
+        issueQ = 0
+        receiveQ = 0
+        adjQ = 0
+        phyQ = (openQ + issueQ + receiveQ + adjQ)
+        product_movement = ProductMovement(
+            product_id = new_product.id,
+            open_stock = openQ,
+            issued_qty = issueQ,
+            received_qty = receiveQ,
+            adjusted_qty = adjQ,
+            physical_qty = phyQ,
+            transaction_name = "",
+            created_by = user_id
+        )
+        db.add(product_movement)
+
+        # create audit trail
+        create_trail = AuditTrail(
+            module_id = new_product.id,
+            module_name = "PostProductRecord",
+            action_taken = "CREATING PRODUCT RECORD",
+            user_id = user_id
+        )
+        db.add(create_trail)
+        db.commit()
         return new_product
 
     def getProductById(self, product_id: int, db: Session):
@@ -270,18 +300,16 @@ class ProductService:
         return new_request
 
     def getAllRequest(self, db: Session):
-        #return db.query(RequestHeader, RequestDetail).join(RequestDetail, RequestDetail.header_id == RequestHeader.id).all()
-        header_result = db.query(RequestHeader).all()
-        detail_request = db.query(RequestDetail).all()
+        headers = db.query(RequestHeader).all()
+        details = db.query(RequestDetail).all()
 
-        header_mapper = {header.id: [] for header in header_result}
-        for detail in detail_request:
-            if detail.header_id in request_results:
-                #request_results[detail.header_id].details.append(detail)
+        header_mapper = {header.id: [] for header in headers}
+        for detail in details:
+            if detail.header_id in header_mapper:
                 header_mapper[detail.header_id].append(detail)
 
         request_results = []
-        for header in header_result:
+        for header in headers:
             header_result = {
                 "id": header.id,
                 "request_description": header.request_description,
@@ -293,3 +321,19 @@ class ProductService:
             request_results.append(header_result)
 
         return request_results
+
+    def getRequestPerId(self, request_id: int, db: Session):
+        headers = db.query(RequestHeader).filter(RequestHeader.id == request_id).first()
+        if not headers:
+            None
+
+        details = db.query(RequestDetail).filter(RequestDetail.header_id == request_id).all()
+        results = {
+            "id": headers.id,
+            "request_description": headers.request_description,
+            "request_status": headers.request_status,
+            "request_type": headers.request_type,
+            "request_date": headers.request_date,
+            "details": details
+        }
+        return results

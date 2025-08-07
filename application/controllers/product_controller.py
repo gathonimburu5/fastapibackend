@@ -134,3 +134,10 @@ def get_requests(db: Session = Depends(get_db), current_user: UserToken = Depend
 def create_request(request: RequestHeaderCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
     productService.createRequest(request, db, current_user)
     return JSONResponse(content={"message": "successfully created request's record", "code": status.HTTP_201_CREATED}, status_code=status.HTTP_201_CREATED)
+
+@product_router.get("/requests/{request_id}", response_model=RequestHeaderOut)
+def get_request(request_id: int, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
+    request_result = productService.getRequestPerId(request_id, db)
+    if not request_result:
+        return JSONResponse(content={"error": "request record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
+    return request_result

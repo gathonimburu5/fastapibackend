@@ -149,3 +149,28 @@ CREATE TABLE "public"."request_detail" (
   "vat_amount" numeric(10, 2) DEFAULT 0.00,
   CONSTRAINT "request_detail_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "public"."audit_trail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "module_id" int4,
+  "module_name" varchar(255),
+  "action_taken" varchar(255),
+  "user_id" int4,
+  "created_on" date,
+  CONSTRAINT "audit_trail_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."product_movement" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "product_id" int4,
+  "open_stock" int4,
+  "issued_qty" int4,
+  "received_qty" int4,
+  "adjusted_qty" int4,
+  "physical_qty" int4,
+  "transaction_name" varchar(255),
+  "transaction_id" int4,
+  "created_on" date,
+  "created_by" int4,
+  CONSTRAINT "product_movement_pkey" PRIMARY KEY ("id")
+);
