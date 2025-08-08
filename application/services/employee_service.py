@@ -22,7 +22,7 @@ class EmployeeService:
                 created_by=user_id
             )
             db.add(new_employee)
-            db.flush(new_employee)
+            db.flush()
 
             # create audit trail
             create_trail = AuditTrail(
@@ -66,7 +66,7 @@ class EmployeeService:
             employee_record.physical_address = employee.physical_address
             employee_record.designation = employee.designation
             employee_record.salary = employee.salary
-            
+
             # create audit trail
             create_trail = AuditTrail(
                 module_id = employee_record.id,
@@ -75,7 +75,7 @@ class EmployeeService:
                 user_id = userId
             )
             db.add(create_trail)
-            
+
             db.commit()
             db.refresh(employee_record)
             return employee_record

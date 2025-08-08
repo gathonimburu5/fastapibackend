@@ -4,6 +4,7 @@ from application.config import SessionLocal
 from fastapi.responses import JSONResponse
 from application.schemas.product_schema import ProductCreate, ProductOut, CategoryCreate, CategoryOut, MeasurementUnitCreate, MeasurementUnitOut, WarehouseCreate, WarehouseOut, TaxCreate, TaxOut, RequestHeaderCreate, RequestHeaderOut
 from application.services.product_service import ProductService
+from application.schemas.trail_schema import ProductMovementOut
 from application.config import get_db
 from application.utility.token import get_current_user
 from application.schemas.user_schema import UserToken
@@ -33,6 +34,13 @@ def update_product(product_id: int, product: ProductCreate, db: Session = Depend
     if not product_record:
         return JSONResponse(content={"error": "product record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated product record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)
+
+@product_router.get("/product_movements/{product_id}", response_model=list[ProductMovementOut])
+def get_product_movement(product_id: int, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
+    movement_record = productService.getProductMovement(product_id, db)
+    if not movement_record:
+        return JSONResponse(content={"error": "product movement record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
+    return movement_record
 
 @product_router.get("/categories", response_model=list[CategoryOut])
 def get_categories(db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
@@ -75,7 +83,7 @@ def get_measurement_unit(unit_id: int, db: Session = Depends(get_db), current_us
 
 @product_router.put("/measurement_units/{unit_id}", response_model=MeasurementUnitOut)
 def update_measurement_unit(unit_id: int, unit: MeasurementUnitCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    unit_record = productService.updateMeasurementUnit(unit_id, unit, db)
+    unit_record = productService.updateMeasurementUnit(unit_id, unit, db, current_user)
     if not unit_record:
         return JSONResponse(content={"error": "measurement unit record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated measurement unit record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)
@@ -121,7 +129,7 @@ def get_tax(tax_id: int, db: Session = Depends(get_db), current_user: UserToken 
 
 @product_router.put("/taxes/{tax_id}", response_model=TaxOut)
 def update_tax(tax_id: int, tax: TaxCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    tax_record = productService.updateTax(tax_id, tax, db)
+    tax_record = productService.updateTax(tax_id, tax, db, current_user)
     if not tax_record:
         return JSONResponse(content={"error": "tax record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated tax record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)

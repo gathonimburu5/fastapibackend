@@ -26,6 +26,7 @@ class CustomerService:
                 created_by=user_id
             )
             db.add(new_customer)
+            db.flush()
 
             # create audit trail
             create_trail = AuditTrail(

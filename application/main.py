@@ -31,3 +31,6 @@ app.include_router(product_router, prefix="/api", tags=["Products"], dependencie
 
 from application.controllers.authentication_controller import authentication_router
 app.include_router(authentication_router, prefix="/api", tags=["Authentication"])
+
+from application.controllers.trail_controller import trail_router
+app.include_router(trail_router, prefix="/api", tags=["AuditTrails"], dependencies=[Depends(get_current_user)])

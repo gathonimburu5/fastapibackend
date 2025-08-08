@@ -78,6 +78,8 @@ class TaxBase(BaseModel):
     tax_code: str
     tax_name: str
     tax_rate: float
+    status: str
+    description: str
 
 class TaxCreate(TaxBase):
     pass

@@ -30,7 +30,7 @@ class ProductService:
                 created_by = user_id
             )
             db.add(new_product)
-            db.flush(new_product)
+            db.flush()
 
             # create product movement
             openQ = new_product.quantity
@@ -143,6 +143,12 @@ class ProductService:
         db.commit()
         return product_record
 
+    def getProductMovement(self, product_id: int, db: Session):
+        movement = db.query(ProductMovement).filter(ProductMovement.product_id == product_id).all()
+        if not movement:
+            return None
+        return movement
+
     def getAllCategories(self, db: Session):
         return db.query(Category).all()
 
@@ -156,8 +162,8 @@ class ProductService:
                 created_by = user_id
             )
             db.add(new_category)
-            db.flush(new_category)
-            
+            db.flush()
+
             # create audit trail
             create_trail = AuditTrail(
                 module_id = new_category.id,
@@ -218,17 +224,32 @@ class ProductService:
         return db.query(MeasurementUnit).all()
 
     def createMeasurementUnit(self, unit: MeasurementUnitCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_unit = MeasurementUnit(
-            unit_name=unit.unit_name,
-            status=unit.status,
-            description=unit.description,
-            created_by = user_id
-        )
-        db.add(new_unit)
-        db.commit()
-        db.refresh(new_unit)
-        return new_unit
+        try:
+            user_id = current_user.id
+            new_unit = MeasurementUnit(
+                unit_name=unit.unit_name,
+                status=unit.status,
+                description=unit.description,
+                created_by = user_id
+            )
+            db.add(new_unit)
+            db.flush()
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_unit.id,
+                module_name = "PostMeasureUnit",
+                action_taken = "CREATING MEASURE UNIT RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(new_unit)
+            return new_unit
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getMeasurementUnitById(self, unit_id: int, db: Session):
         unit_record = db.query(MeasurementUnit).filter(MeasurementUnit.id == unit_id).first()
@@ -236,16 +257,31 @@ class ProductService:
             return unit_record
         return None
 
-    def updateMeasurementUnit(self, unit_id: int, unit: MeasurementUnitCreate, db: Session):
-        unit_record = db.query(MeasurementUnit).filter(MeasurementUnit.id == unit_id).first()
-        if not unit_record:
-            return None
-        unit_record.unit_name = unit.unit_name
-        unit_record.status = unit.status
-        unit_record.description = unit.description
-        db.commit()
-        db.refresh(unit_record)
-        return unit_record
+    def updateMeasurementUnit(self, unit_id: int, unit: MeasurementUnitCreate, db: Session, current_user):
+        try:
+            user_id = current_user.id
+            unit_record = db.query(MeasurementUnit).filter(MeasurementUnit.id == unit_id).first()
+            if not unit_record:
+                return None
+            unit_record.unit_name = unit.unit_name
+            unit_record.status = unit.status
+            unit_record.description = unit.description
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = unit_record.id,
+                module_name = "UpdateMeasureUnit",
+                action_taken = "UPDATING MEASURE UNIT RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(unit_record)
+            return unit_record
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def deleteMeasurementUnit(self, unit_id: int, db: Session):
         unit_record = db.query(MeasurementUnit).filter(MeasurementUnit.id == unit_id).first()
@@ -259,23 +295,27 @@ class ProductService:
         return db.query(Warehouse).all()
 
     def createWarehouse(self, warehouse: WarehouseCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_warehouse = Warehouse(
-            warehouse_code=warehouse.warehouse_code,
-            warehouse_name=warehouse.warehouse_name,
-            location=warehouse.location,
-            status=warehouse.status,
-            warehouse_description=warehouse.warehouse_description,
-            warehouse_type=warehouse.warehouse_type,
-            warehouse_address=warehouse.warehouse_address,
-            warehouse_stage=warehouse.warehouse_stage,
-            quantity=warehouse.quantity,
-            created_by = user_id
-        )
-        db.add(new_warehouse)
-        db.commit()
-        db.refresh(new_warehouse)
-        return new_warehouse
+        try:
+            user_id = current_user.id
+            new_warehouse = Warehouse(
+                warehouse_code=warehouse.warehouse_code,
+                warehouse_name=warehouse.warehouse_name,
+                location=warehouse.location,
+                status=warehouse.status,
+                warehouse_description=warehouse.warehouse_description,
+                warehouse_type=warehouse.warehouse_type,
+                warehouse_address=warehouse.warehouse_address,
+                warehouse_stage=warehouse.warehouse_stage,
+                quantity=warehouse.quantity,
+                created_by = user_id
+            )
+            db.add(new_warehouse)
+            db.commit()
+            db.refresh(new_warehouse)
+            return new_warehouse
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getWarehouseById(self, warehouse_id: int, db: Session):
         warehouse_record = db.query(Warehouse).filter(Warehouse.id == warehouse_id).first()
@@ -312,19 +352,34 @@ class ProductService:
         return db.query(Tax).all()
 
     def createTax(self, tax: TaxCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_tax = Tax(
-            tax_code=tax.tax_code,
-            tax_name=tax.tax_name,
-            tax_rate=tax.tax_rate,
-            status=tax.status,
-            description=tax.description,
-            created_by = user_id
-        )
-        db.add(new_tax)
-        db.commit()
-        db.refresh(new_tax)
-        return new_tax
+        try:
+            user_id = current_user.id
+            new_tax = Tax(
+                tax_code=tax.tax_code,
+                tax_name=tax.tax_name,
+                tax_rate=tax.tax_rate,
+                status=tax.status,
+                description=tax.description,
+                created_by = user_id
+            )
+            db.add(new_tax)
+            db.flush()
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_tax.id,
+                module_name = "PostTax",
+                action_taken = "CREATING TAX RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(new_tax)
+            return new_tax
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getTaxById(self, tax_id: int, db: Session):
         tax_record = db.query(Tax).filter(Tax.id == tax_id).first()
@@ -332,45 +387,75 @@ class ProductService:
             return tax_record
         return None
 
-    def updateTax(self, tax_id: int, tax: TaxCreate, db: Session):
-        tax_record = db.query(Tax).filter(Tax.id == tax_id).first()
-        if not tax_record:
-            return None
-        tax_record.tax_code = tax.tax_code
-        tax_record.tax_name = tax.tax_name
-        tax_record.tax_rate = tax.tax_rate
-        tax_record.status = tax.status
-        tax_record.description = tax.description
-        db.commit()
-        db.refresh(tax_record)
-        return tax_record
-    def createRequest(self, request: RequestHeaderCreate, db: Session, current_user):
-        user_id = current_user.id
-        new_request = RequestHeader(
-            request_description = request.request_description,
-            request_date = request.request_date,
-            request_type = request.request_type,
-            created_by = user_id
-        )
-        db.add(new_request)
-        db.commit()
-        db.refresh(new_request)
+    def updateTax(self, tax_id: int, tax: TaxCreate, db: Session, current_user):
+        try:
+            user_id = current_user.id
+            tax_record = db.query(Tax).filter(Tax.id == tax_id).first()
+            if not tax_record:
+                return None
+            tax_record.tax_code = tax.tax_code
+            tax_record.tax_name = tax.tax_name
+            tax_record.tax_rate = tax.tax_rate
+            tax_record.status = tax.status
+            tax_record.description = tax.description
 
-        for detail in request.details:
-            new_detail = RequestDetail(
-                header_id = new_request.id,
-                product_id = detail.product_id,
-                quantity = detail.quantity,
-                unit_price = detail.unit_price,
-                net_price = detail.net_price,
-                more_detail = detail.more_detail,
-                vat_id = detail.vat_id,
-                vat_amount = detail.vat_amount
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = tax_record.id,
+                module_name = "UpdateTax",
+                action_taken = "UPDATING TAX RECORD",
+                user_id = user_id
             )
-            db.add(new_detail)
+            db.add(create_trail)
 
-        db.commit()
-        return new_request
+            db.commit()
+            db.refresh(tax_record)
+            return tax_record
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
+
+    def createRequest(self, request: RequestHeaderCreate, db: Session, current_user):
+        try:
+            user_id = current_user.id
+            new_request = RequestHeader(
+                request_description = request.request_description,
+                request_date = request.request_date,
+                request_type = request.request_type,
+                created_by = user_id
+            )
+            db.add(new_request)
+            db.flush()
+            db.commit()
+            db.refresh(new_request)
+
+            for detail in request.details:
+                new_detail = RequestDetail(
+                    header_id = new_request.id,
+                    product_id = detail.product_id,
+                    quantity = detail.quantity,
+                    unit_price = detail.unit_price,
+                    net_price = detail.net_price,
+                    more_detail = detail.more_detail,
+                    vat_id = detail.vat_id,
+                    vat_amount = detail.vat_amount
+                )
+                db.add(new_detail)
+
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_request.id,
+                module_name = "CreateRequest",
+                action_taken = "CREATING REQUESTS RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            return new_request
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
 
     def getAllRequest(self, db: Session):
         headers = db.query(RequestHeader).all()
