@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from application.models.product_model import Product, Category, MeasurementUnit, Warehouse, Tax, RequestHeader, RequestDetail
 from application.schemas.product_schema import ProductCreate, CategoryCreate, MeasurementUnitCreate, WarehouseCreate, TaxCreate, RequestHeaderCreate
 from application.models.trail_model import AuditTrail, ProductMovement
+from application.utility.files import saveFiles
 
 class ProductService:
     def getAllProductRecords(self, db: Session):
