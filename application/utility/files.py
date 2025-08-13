@@ -6,7 +6,7 @@ from pathlib import Path
 UPLOAD_FOLDER = Path("uploads/customerFiles")
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
-def saveFiles(file: UploadFile):
+async def saveFiles(file: UploadFile):
     folder_path = UPLOAD_FOLDER
     folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -15,5 +15,5 @@ def saveFiles(file: UploadFile):
     file_path = folder_path/unique_name
 
     with open(file_path, "wb") as buffer:
-        buffer.write(file.read())
-    return str(file_path)
+        buffer.write(await file.read())
+    return unique_name

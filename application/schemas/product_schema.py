@@ -1,30 +1,41 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import date
 
-class ProductBase(BaseModel):
+class ProductCreate(BaseModel):
+    product_code: str
+    product_name: str
+    product_type: str
+    description: str
+    buy_price: float
+    sell_price: float
+    quantity_per_unit: int
+    quantity: int
+    category_id: int
+    supplier_id: int
+    unit_id: int
+    reorder_level: int
+    non_stock_item: str
+    tax_id: int
+    warehouse_id: int
+class ProductOut(BaseModel):
     id: int
     product_code: str
     product_name: str
     product_type: str
-    description: str | None = None
+    description: str
     buy_price: float
     sell_price: float
     quantity_per_unit: int
-    quantity: int = 0
+    quantity: int
     category_id: int
-    supplier_id: int | None = None
-    unit_id: int | None = None
-    reorder_level: int = 0
-    product_image: str | None = None
-    non_stock_item: str = "no"
-    tax_id: int | None = None
-    warehouse_id: int | None = None
-
-class ProductCreate(ProductBase):
-    pass
-
-class ProductOut(ProductBase):
-    id: int
+    supplier_id: int
+    unit_id: int
+    reorder_level: int
+    non_stock_item: str
+    tax_id: int
+    warehouse_id: int
+    product_image: str
     class Config:
         orm_mode = True
 

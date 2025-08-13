@@ -3,14 +3,17 @@ from application.models.product_model import Product, Category, MeasurementUnit,
 from application.schemas.product_schema import ProductCreate, CategoryCreate, MeasurementUnitCreate, WarehouseCreate, TaxCreate, RequestHeaderCreate
 from application.models.trail_model import AuditTrail, ProductMovement
 from application.utility.files import saveFiles
+from fastapi import UploadFile
 
 class ProductService:
     def getAllProductRecords(self, db: Session):
         return db.query(Product).all()
 
-    def createProductRecord(self, product: ProductCreate, db: Session, current_user):
+    async def createProductRecord(self, product: ProductCreate, prodImage: UploadFile, db: Session, current_user):
         try:
             user_id = current_user.id
+            prod_image = await saveFiles(prodImage)
+            print(prod_image)
             new_product = Product(
                 product_code=product.product_code,
                 product_name=product.product_name,
@@ -23,9 +26,9 @@ class ProductService:
                 category_id=product.category_id,
                 supplier_id=product.supplier_id,
                 unit_id=product.unit_id,
-                reoder_level=product.reorder_level,
-                product_image=product.product_image,
-                nonstock_item=product.non_stock_item,
+                reorder_level=product.reorder_level,
+                product_image=prod_image,
+                non_stock_item=product.non_stock_item,
                 tax_id=product.tax_id,
                 warehouse_id=product.warehouse_id,
                 created_by = user_id

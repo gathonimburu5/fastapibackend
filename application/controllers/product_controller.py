@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from application.config import SessionLocal
 from fastapi.responses import JSONResponse
 from application.schemas.product_schema import ProductCreate, ProductOut, CategoryCreate, CategoryOut, MeasurementUnitCreate, MeasurementUnitOut, WarehouseCreate, WarehouseOut, TaxCreate, TaxOut, RequestHeaderCreate, RequestHeaderOut
 from application.services.product_service import ProductService
@@ -8,6 +7,7 @@ from application.schemas.trail_schema import ProductMovementOut
 from application.config import get_db
 from application.utility.token import get_current_user
 from application.schemas.user_schema import UserToken
+import json
 
 product_router = APIRouter()
 productService = ProductService()
@@ -17,8 +17,42 @@ def get_products(db: Session = Depends(get_db), current_user: UserToken = Depend
     return productService.getAllProductRecords(db)
 
 @product_router.post("/products", response_model=ProductOut)
-def create_product(product: ProductCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    productService.createProductRecord(product, db, current_user)
+async def create_product(
+    product_code: str = Form(...),
+    product_name: str = Form(...),
+    product_type: str = Form(...),
+    description: str = Form(...),
+    buy_price: float = Form(...),
+    sell_price: float = Form(...),
+    quantity_per_unit: int = Form(...),
+    quantity: int = Form(...),
+    category_id: int = Form(...),
+    supplier_id: int = Form(...),
+    unit_id: int = Form(...),
+    reorder_level: int = Form(...),
+    non_stock_item: str = Form(...),
+    tax_id: int = Form(...),
+    warehouse_id: int = Form(...),
+    prodImage: UploadFile = File(...), 
+    db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
+    product_obj = ProductCreate(
+        product_code=product_code,
+        product_name=product_name,
+        product_type=product_type,
+        description=description,
+        buy_price=buy_price,
+        sell_price=sell_price,
+        quantity_per_unit=quantity_per_unit,
+        quantity=quantity,
+        category_id=category_id,
+        supplier_id=supplier_id,
+        unit_id=unit_id,
+        reorder_level=reorder_level,
+        non_stock_item=non_stock_item,
+        tax_id=tax_id,
+        warehouse_id=warehouse_id
+    )
+    await productService.createProductRecord(product_obj, prodImage, db, current_user)
     return JSONResponse(content={"message": "successfully created product record", "code": status.HTTP_201_CREATED}, status_code=status.HTTP_201_CREATED)
 
 @product_router.get("/products/{product_id}", response_model=ProductOut)
