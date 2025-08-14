@@ -24,7 +24,6 @@ class Product(Base):
     warehouse_id = Column(Integer, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
 class Category(Base):
     __tablename__ = 'categories'
 
@@ -34,7 +33,6 @@ class Category(Base):
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
 class MeasurementUnit(Base):
     __tablename__ = 'measurement_units'
 
@@ -44,7 +42,6 @@ class MeasurementUnit(Base):
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
 class Warehouse(Base):
     __tablename__ = 'warehouses'
 
@@ -60,7 +57,6 @@ class Warehouse(Base):
     quantity = Column(Integer, default=0, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
 class Tax(Base):
     __tablename__ = 'taxes'
 
@@ -72,8 +68,6 @@ class Tax(Base):
     description = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
-
 class RequestHeader(Base):
     __tablename__ = 'request_header'
 
@@ -84,7 +78,6 @@ class RequestHeader(Base):
     request_type = Column(String, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
 class RequestDetail(Base):
     __tablename__ = 'request_detail'
 

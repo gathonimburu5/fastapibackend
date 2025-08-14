@@ -12,7 +12,7 @@ class ProductService:
     async def createProductRecord(self, product: ProductCreate, prodImage: UploadFile, db: Session, current_user):
         try:
             user_id = current_user.id
-            prod_image = await saveFiles(prodImage)
+            prod_image = await saveFiles(prodImage, "ProductFiles")
             print(prod_image)
             new_product = Product(
                 product_code=product.product_code,

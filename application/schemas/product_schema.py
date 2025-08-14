@@ -38,34 +38,42 @@ class ProductOut(BaseModel):
     product_image: str
     class Config:
         orm_mode = True
-
-class CategoryBase(BaseModel):
+class CategoryCreate(BaseModel):
+    id: int
+    category_name: str
+    status: str
+    description: str
+class CategoryOut(BaseModel):
     id: int
     category_name: str
     status: str = "active"
     description: str | None = None
-
-class CategoryCreate(CategoryBase):
-    pass
-class CategoryOut(CategoryBase):
-    id: int
     class Config:
         orm_mode = True
-
-class MeasurementUnitBase(BaseModel):
+class MeasurementUnitCreate(BaseModel):
     id: int
     unit_name: str
-    status: str = "active"
-    description: str | None = None
-
-class MeasurementUnitCreate(MeasurementUnitBase):
-    pass
-class MeasurementUnitOut(MeasurementUnitBase):
+    status: str
+    description: str
+class MeasurementUnitOut(BaseModel):
     id: int
+    unit_name: str
+    status: str
+    description: str
     class Config:
         orm_mode = True
-
-class WarehouseBase(BaseModel):
+class WarehouseCreate(BaseModel):
+    id: int
+    warehouse_code: str
+    warehouse_name: str
+    location: str
+    status: str = "active"
+    warehouse_description: str | None = None
+    warehouse_type: str
+    warehouse_address: str
+    warehouse_stage: str
+    quantity: int
+class WarehouseOut(BaseModel):
     id: int
     warehouse_code: str
     warehouse_name: str
@@ -76,29 +84,24 @@ class WarehouseBase(BaseModel):
     warehouse_address: str
     warehouse_stage: str
     quantity: int = 0
-
-class WarehouseCreate(WarehouseBase):
-    pass
-class WarehouseOut(WarehouseBase):
-    id: int
     class Config:
         orm_mode = True
-
-class TaxBase(BaseModel):
+class TaxCreate(BaseModel):
     id: int
     tax_code: str
     tax_name: str
     tax_rate: float
     status: str
     description: str
-
-class TaxCreate(TaxBase):
-    pass
-class TaxOut(TaxBase):
+class TaxOut(BaseModel):
     id: int
+    tax_code: str
+    tax_name: str
+    tax_rate: float
+    status: str
+    description: str
     class Config:
         orm_mode = True
-
 class RequestDetailCreate(BaseModel):
     id: int
     header_id: int
@@ -109,7 +112,6 @@ class RequestDetailCreate(BaseModel):
     more_detail: str
     vat_id: int
     vat_amount: float
-
 class RequestHeaderCreate(BaseModel):
     id: int
     request_description: str
@@ -117,7 +119,6 @@ class RequestHeaderCreate(BaseModel):
     request_status: str
     request_type: str
     details: list[RequestDetailCreate]
-
 class RequestDetailOut(BaseModel):
     id: int
     header_id: int
@@ -131,7 +132,6 @@ class RequestDetailOut(BaseModel):
 
     class Confif:
         orm_mode = True
-
 class RequestHeaderOut(BaseModel):
     id: int
     request_description: str

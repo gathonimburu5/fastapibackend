@@ -20,7 +20,9 @@ class Employee(Base):
     status = Column(String, default="active", nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
-
+    business_certificate = Column(String, nullable=True)
+    cr12_certificate = Column(String, nullable=True)
+    business_permit = Column(String, nullable=True)
 class Customer(Base):
     __tablename__ = 'customers'
 
@@ -42,3 +44,6 @@ class Customer(Base):
     currency_id = Column(Integer, nullable=False)
     created_on = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, nullable=False)
+    business_certificate = Column(String, nullable=True)
+    cr12_certificate = Column(String, nullable=True)
+    business_permit = Column(String, nullable=True)

@@ -3,11 +3,11 @@ import uuid
 from fastapi import UploadFile
 from pathlib import Path
 
-UPLOAD_FOLDER = Path("uploads/customerFiles")
-UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+#UPLOAD_FOLDER = Path("uploads/customerFiles")
+#UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
-async def saveFiles(file: UploadFile):
-    folder_path = UPLOAD_FOLDER
+async def saveFiles(file: UploadFile, folder_name: str):
+    folder_path = Path(f"uploads/{folder_name}")
     folder_path.mkdir(parents=True, exist_ok=True)
 
     file_ext = os.path.splitext(file.filename)[1]

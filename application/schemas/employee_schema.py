@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 
-class EmployeeBase(BaseModel):
+class EmployeeCreate(BaseModel):
     id: int
     employee_name: str
     email_address: str
@@ -14,16 +14,25 @@ class EmployeeBase(BaseModel):
     physical_address: str
     designation: str
     salary: float
-
-class EmployeeCreate(EmployeeBase):
-    pass
-
-class EmployeeOut(EmployeeBase):
+class EmployeeOut(BaseModel):
     id: int
+    employee_name: str
+    email_address: str
+    id_number: str
+    phone_number: str
+    department: str
+    postal_address: str
+    date_of_birth: date
+    date_of_joining: date
+    physical_address: str
+    designation: str
+    salary: float
+    business_certificate: str
+    cr12_certificate: str
+    business_permit: str
     class Config:
         orm_mode = True
-
-class CustomerBase(BaseModel):
+class CustomerCreate(BaseModel):
     id: int
     customer_name: str
     email_address: str
@@ -40,10 +49,25 @@ class CustomerBase(BaseModel):
     opening_balance_date: date
     opening_balance_rate: float
     currency_id: int
-
-class CustomerCreate(CustomerBase):
-    pass
-class CustomerOut(CustomerBase):
+class CustomerOut(BaseModel):
     id: int
+    customer_name: str
+    email_address: str
+    phone_number: str
+    postal_address: str
+    physical_address: str
+    date_of_birth: date
+    date_of_registration: date
+    vat_pin: str
+    credit_limit: float
+    sales_rep_id: int
+    status: str
+    opening_balance: float
+    opening_balance_date: date
+    opening_balance_rate: float
+    currency_id: int
+    business_certificate: str
+    cr12_certificate: str
+    business_permit: str
     class Config:
         orm_mode = True
