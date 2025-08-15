@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, status
+from datetime import date
+from fastapi import APIRouter, Depends, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from application.config import SessionLocal
 from application.schemas.employee_schema import EmployeeCreate, EmployeeOut
@@ -16,8 +17,36 @@ def get_employees(db: Session = Depends(get_db), current_user: UserToken = Depen
     return employeeService.getAllEmployee(db)
 
 @employee_router.post("/employees", response_model=EmployeeOut)
-def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
-    employeeService.createEmployeeService(employee, db, current_user)
+def create_employee(
+    employee_name: str = Form(...),
+    email_address: str = Form(...),
+    id_number: str = Form(...),
+    phone_number: str = Form(...),
+    department: str = Form(...),
+    postal_address: str = Form(...),
+    date_of_birth: date = Form(...),
+    date_of_joining: date = Form(...),
+    physical_address: str = Form(...),
+    designation: str = Form(...),
+    salary: float = Form(...),
+    bsFiles: UploadFile = File(...),
+    cr12Files: UploadFile = File(...),
+    permitFiles: UploadFile = File(...),
+    db: Session = Depends(get_db), current_user: UserToken = Depends(get_current_user)):
+    employee_obj = EmployeeCreate(
+        employee_name=employee_name,
+        email_address=email_address,
+        id_number=id_number,
+        phone_number=phone_number,
+        department=department,
+        postal_address=postal_address,
+        date_of_birth=date_of_birth,
+        date_of_joining=date_of_joining,
+        physical_address=physical_address,
+        designation=designation,
+        salary=salary
+    )
+    employeeService.createEmployeeService(employee_obj, bsFiles, cr12Files, permitFiles, db, current_user)
     return JSONResponse(content={"message": "successfully created employee record", "code": status.HTTP_201_CREATED}, status_code=status.HTTP_201_CREATED)
 
 @employee_router.get("/employees/{employee_id}", response_model=EmployeeOut)

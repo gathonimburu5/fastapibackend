@@ -2,11 +2,16 @@ from sqlalchemy.orm import Session
 from application.models.employee_model import Employee
 from application.schemas.employee_schema import EmployeeCreate
 from application.models.trail_model import AuditTrail
+from application.utility.files import saveFiles
+from fastapi import UploadFile
 
 class EmployeeService:
-    def createEmployeeService(self, employee: EmployeeCreate, db: Session, current_user):
+    async def createEmployeeService(self, employee: EmployeeCreate, bsFiles: UploadFile, cr12Files: UploadFile, permitFiles: UploadFile, db: Session, current_user):
         try:
             user_id = current_user.id
+            bs_file = await saveFiles(bsFiles, "EmployeeFile")
+            cr12_file = await saveFiles(cr12Files, "EmployeeFile")
+            permit_file = await saveFiles(permitFiles, "EmployeeFile")
             new_employee = Employee(
                 employee_name=employee.employee_name,
                 email_address=employee.email_address,
@@ -19,7 +24,10 @@ class EmployeeService:
                 physical_address=employee.physical_address,
                 designation=employee.designation,
                 salary=employee.salary,
-                created_by=user_id
+                created_by=user_id,
+                business_certificate = bs_file,
+                cr12_certificate = cr12_file,
+                business_permit = permit_file
             )
             db.add(new_employee)
             db.flush()

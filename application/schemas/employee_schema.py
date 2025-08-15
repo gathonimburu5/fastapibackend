@@ -44,7 +44,6 @@ class CustomerCreate(BaseModel):
     vat_pin: str
     credit_limit: float
     sales_rep_id: int
-    status: str
     opening_balance: float
     opening_balance_date: date
     opening_balance_rate: float

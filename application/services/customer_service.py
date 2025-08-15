@@ -2,11 +2,16 @@ from sqlalchemy.orm import Session
 from application.models.employee_model import Customer
 from application.schemas.employee_schema import CustomerCreate
 from application.models.trail_model import AuditTrail
+from application.utility.files import saveFiles
+from fastapi import UploadFile
 
 class CustomerService:
-    def createCustomerService(self, customer: CustomerCreate, db: Session, current_user):
+    async def createCustomerService(self, customer: CustomerCreate, bsCertificate: UploadFile, cr12Certificate: UploadFile, bsPermit: UploadFile, db: Session, current_user):
         try:
             user_id = current_user.id
+            bs_file = await saveFiles(bsCertificate, "CustomerFiles")
+            cr12_file = await saveFiles(cr12Certificate, "CustomerFiles")
+            permit_file = await saveFiles(bsPermit, "CustomerFiles")
             new_customer = Customer(
                 customer_name=customer.customer_name,
                 email_address=customer.email_address,
@@ -23,7 +28,10 @@ class CustomerService:
                 opening_balance_date=customer.opening_balance_date,
                 opening_balance_rate=customer.opening_balance_rate,
                 currency_id=customer.currency_id,
-                created_by=user_id
+                created_by=user_id,
+                business_certificate = bs_file,
+                cr12_certificate = cr12_file,
+                business_permit = permit_file
             )
             db.add(new_customer)
             db.flush()
