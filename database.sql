@@ -197,3 +197,216 @@ CREATE TABLE "public"."warehouse_movement" (
   "created_by" int4,
   CONSTRAINT "warehouse_movement_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "public"."sale_invoice_header" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "lpo_ref" int4,
+  "invoice_amount" numeric(24,2),
+  "delivery_address" varchar(255) COLLATE "pg_catalog"."default",
+  "delivery_date" date,
+  "invoice_date" date,
+  "cust_id" int4,
+  "due_date" date,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "created_on" date,
+  "created_by" int4,
+  "doc_prefix" varchar(255) COLLATE "pg_catalog"."default",
+  "crn_reason" varchar(255) COLLATE "pg_catalog"."default",
+  "has_credit_note" bool,
+  "branch" int4,
+  "invoice_balance" numeric(255,2),
+  "credit_note_amount" numeric,
+  "lpo_file" varchar(300) COLLATE "pg_catalog"."default",
+  "entry_number" varchar(250) COLLATE "pg_catalog"."default",
+  "rate" numeric(24,2) DEFAULT 1,
+  "is_reversed" bool DEFAULT false,
+  "statement_description" varchar(250) COLLATE "pg_catalog"."default",
+  "invoice_number" int4,
+  "crn_date" date,
+  "crn_vat" numeric(20,2),
+  "crn_vat_percent" varchar(24) COLLATE "pg_catalog"."default",
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."sale_invoice_detail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "header_id" int4,
+  "vat_percent" text COLLATE "pg_catalog"."default",
+  "vat_amt" numeric(24,2),
+  "description" text COLLATE "pg_catalog"."default",
+  "quantity" int4,
+  "totals" numeric(24,2),
+  "unit_price" numeric(24,5),
+  "discount_perc" numeric(24,2),
+  "discount_amt" numeric(24,2),
+  "additional_details" varchar(255) COLLATE "pg_catalog"."default",
+  "inventory_id" int4,
+	PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."sale_credit_note_detail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "invoice_id" int4,
+  "inventory_id" int4,
+  "quantity" int4,
+  "unit_price" numeric(24,2),
+  "total_crn" numeric(24,2),
+  "created_on" date,
+  "created_by" int4,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "vat_per" int4,
+  "vat_amount" numeric(24,2),
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."sale_receipts" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "pay_date" date,
+  "receipt_amount" numeric(100,2),
+  "pay_mode" varchar(255) COLLATE "pg_catalog"."default",
+  "cheque_number" varchar(255) COLLATE "pg_catalog"."default",
+  "received_from" varchar(255) COLLATE "pg_catalog"."default",
+  "additional_details" varchar(255) COLLATE "pg_catalog"."default",
+  "created_on" date,
+  "created_by" int4,
+  "branch_id" int4,
+  "status" varchar(50) COLLATE "pg_catalog"."default",
+  "cust_id" int4,
+  "rate" numeric(10,4),
+  "allocation_remainder" numeric(100,2),
+  "is_reversed" bool DEFAULT false,
+	PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."sale_receipts_details" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "inv_id" int4,
+  "amount_allocated" numeric(100,2),
+  "receipt_id" int4,
+  "allocated_by" int4,
+  "allocated_on" date,
+  "description" varchar(1000) COLLATE "pg_catalog"."default",
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."pl_invoice_header" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "supplier_id" int4,
+  "lpo_ref" varchar(400) COLLATE "pg_catalog"."default",
+  "invoice_date" date,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "created_by" int4,
+  "created_on" date,
+  "doc_prefix" varchar(255) COLLATE "pg_catalog"."default",
+  "has_credit_note" bool,
+  "due_date" date,
+  "crn_date" date,
+  "totals" numeric(30,2),
+  "total_discount" numeric(30,2),
+  "balance" numeric(30,2),
+  "branch" int4,
+  "entry_number" int4,
+  "rate" numeric(10,4),
+  "crn_total" numeric(30,0),
+  "crn_vat" numeric(10,0),
+  "crn_reference" varchar(100) COLLATE "pg_catalog"."default",
+  "crn_vat_percent" varchar(24) COLLATE "pg_catalog"."default",
+  "is_reversed" bool DEFAULT false,
+	PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."pl_invoice_detail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+	"header_id" int4,
+  "unit_price" numeric(19,2),
+  "vat_percentage" varchar(24) COLLATE "pg_catalog"."default",
+  "vat_amount" numeric(19,2),
+  "description" varchar(100) COLLATE "pg_catalog"."default",
+  "quantity" numeric(10,2),
+  "discount_amt" numeric(19,2),
+  "total" numeric(19,2),
+  "inventory_id" int4,
+	PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."pl_receipts" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "pay_date" date,
+  "paid_amount" numeric(10,2),
+  "pay_mode" varchar(255) COLLATE "pg_catalog"."default",
+  "cheque_number" varchar(255) COLLATE "pg_catalog"."default",
+  "received_from" varchar(255) COLLATE "pg_catalog"."default",
+  "payment_details" varchar(255) COLLATE "pg_catalog"."default",
+  "created_on" date,
+  "created_by" int4,
+  "branch_id" int4,
+  "rate" numeric(10,2),
+  "supplier_id" int4,
+  "allocation_remainder" numeric(10,2),
+  "is_reversed" bool DEFAULT false,
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."pl_receipts_details" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "inv_id" int4,
+  "amount_allocated" numeric(100,2),
+  "receipt_id" int4,
+  "allocated_by" int4,
+  "allocated_on" date,
+  "description" varchar(1000) COLLATE "pg_catalog"."default",
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."pl_credit_note_detail" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "invoice_id" int4,
+  "inventory_id" int4,
+  "quantity" int4,
+  "unit_price" numeric(24,2),
+  "total_crn" numeric(24,2),
+  "created_on" date,
+  "created_by" int4,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "vat_per" int4,
+  "vat_amount" numeric(24,2),
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."journal_header" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "journal_desc" varchar(200) COLLATE "pg_catalog"."default",
+  "transaction_date" date,
+  "trans_period" numeric(2,0),
+  "tran_year" numeric(4,0),
+  "tran_from" varchar(50) COLLATE "pg_catalog"."default",
+  "sale_id" int8,
+  "purchase_id" int8,
+  "created_on" date,
+	"created_by" int4,
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."journal_details" (
+    "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "journal_id" int4,
+  "account_id" int4,
+  "dr" numeric(10,2),
+  "cr" numeric(10,2),
+  "amount" numeric(10,2),
+  "narration" varchar(255) COLLATE "pg_catalog"."default",
+  "folio_no" varchar(100) COLLATE "pg_catalog"."default",
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."accounts" (
+	"id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "accounts_name" varchar(50) COLLATE "pg_catalog"."default",
+  "group_id" int4,
+  "opening_balance" numeric(10,2),
+  "opening_balance_date" date,
+  "has_opening_balance" bool DEFAULT false,
+  "is_bank_acc" bool DEFAULT false,
+	"created_on" date,
+	"created_by" int4,
+  PRIMARY KEY ("id")
+);
+CREATE TABLE "public"."account_groups" (
+  "id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 MINVALUE  1 MAXVALUE 2147483647 START 1 CACHE 1),
+  "group_name" varchar(50) COLLATE "pg_catalog"."default",
+  "primary_group_code" varchar(6) COLLATE "pg_catalog"."default",
+  "group_type" varchar(50) COLLATE "pg_catalog"."default",
+  "group_sub_type" varchar(50) COLLATE "pg_catalog"."default",
+  "group_level" int4,
+	"created_on" date,
+	"created_by" int4,
+  PRIMARY KEY ("id")
+);
