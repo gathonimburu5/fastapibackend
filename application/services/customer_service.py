@@ -23,7 +23,6 @@ class CustomerService:
                 vat_pin=customer.vat_pin,
                 credit_limit=customer.credit_limit,
                 sales_rep_id=customer.sales_rep_id,
-                status=customer.status,
                 opening_balance=customer.opening_balance,
                 opening_balance_date=customer.opening_balance_date,
                 opening_balance_rate=customer.opening_balance_rate,
@@ -77,7 +76,6 @@ class CustomerService:
             customer_record.vat_pin = customer.vat_pin
             customer_record.credit_limit = customer.credit_limit
             customer_record.sales_rep_id = customer.sales_rep_id
-            customer_record.status = customer.status
             customer_record.opening_balance = customer.opening_balance
             customer_record.opening_balance_date = customer.opening_balance_date
             customer_record.opening_balance_rate = customer.opening_balance_rate
