@@ -130,7 +130,7 @@ class RequestDetailOut(BaseModel):
     vat_id: int
     vat_amount: float
 
-    class Confif:
+    class Config:
         orm_mode = True
 class RequestHeaderOut(BaseModel):
     id: int

@@ -70,9 +70,3 @@ def update_customer(customer_id: int, customer: CustomerCreate, db: Session = De
         return JSONResponse(content={"error": "customer record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message": "successfully updated customer record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)
 
-# @customer_router.delete("/customers/{customer_id}")
-# def delete_customer(customer_id: int, db: Session = Depends(get_db)):
-#     result = customerService.deleteCustomerService(customer_id, db)
-#     if not result:
-#         return JSONResponse(content={"error": "customer record not found", "code": status.HTTP_404_NOT_FOUND}, status_code=status.HTTP_404_NOT_FOUND)
-#     return JSONResponse(content={"message": "successfully deleted customer record", "code": status.HTTP_200_OK}, status_code=status.HTTP_200_OK)

@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
 from application.models.employee_model import Customer
+from application.models.credit_note_model import CreditNote, CreditNoteDetail
 from application.schemas.employee_schema import CustomerCreate
+from application.schemas.credit_note_schema import CreditNoteCreate
 from application.models.trail_model import AuditTrail
 from application.utility.files import saveFiles
 from fastapi import UploadFile
+from datetime import datetime
 
 class CustomerService:
     async def createCustomerService(self, customer: CustomerCreate, bsCertificate: UploadFile, cr12Certificate: UploadFile, bsPermit: UploadFile, db: Session, current_user):
@@ -104,3 +107,47 @@ class CustomerService:
         db.delete(customer_record)
         db.commit()
         return customer_record
+    
+    def createCreditNote(self, request: CreditNoteCreate, db: Session, current_user):
+        try:
+            user_id = current_user.id
+            new_crn = CreditNote(
+                invoice_id = request.invoice_id,
+                credit_date = request.credit_date,
+                credit_reasons = request.credit_reasons,
+                total_credit = request.total_credit,
+                total_vat_amount = request.total_vat_amount,
+                credit_period = request.credit_period,
+                created_on = datetime.utcnow(),
+                created_by = user_id
+            )
+            db.add(new_crn)
+            db.flush()
+
+            for detail in request.details:
+                new_details = CreditNoteDetail(
+                    header_id = new_crn.id,
+                    inventory_id = detail.inventory_id,
+                    quantity = detail.quantity,
+                    unit_price = detail.unit_price,
+                    net_price = detail.net_price,
+                    vat_id = detail.vat_id,
+                    net_vat = detail.net_vat
+                )
+                db.add(new_details)
+            
+            # create audit trail
+            create_trail = AuditTrail(
+                module_id = new_crn.id,
+                module_name = "createCreditNote",
+                action_taken = "CREATING CREDIT NOTE RECORD",
+                user_id = user_id
+            )
+            db.add(create_trail)
+
+            db.commit()
+            db.refresh(new_crn)
+            return new_crn
+        except Exception as e:
+            db.rollback()
+            return f"an error occurred: {str(e)}"
