@@ -50,3 +50,25 @@ class JournalService:
         except Exception as e:
             db.rollback()
             return f"an error occurred: {str(e)}"
+
+    def getAllJournalRecords(self, db: Session):
+        return db.query(JournalHeader).all()
+
+    def getJournalPerId(self, journalId: int, db: Session):
+        header = db.query(JournalHeader).filter(JournalHeader.id == journalId).first()
+        if not header:
+            return None
+        details = db.query(JournalDetails).filter(JournalDetails.journal_id == journalId).all()
+        results = {
+            "id": header.id,
+            "journal_description": header.journal_description,
+            "journal_date": header.journal_date,
+            "transaction_period": header.transaction_period,
+            "transaction_year": header.transaction_year,
+            "transaction_form": header.transaction_form,
+            "sale_reference": header.sale_reference,
+            "purchase_reference": header.purchase_reference,
+            "credit_reference": header.credit_reference,
+            "details": details
+        }
+        return results
