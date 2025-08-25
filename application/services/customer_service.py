@@ -107,7 +107,7 @@ class CustomerService:
         db.delete(customer_record)
         db.commit()
         return customer_record
-    
+
     def createCreditNote(self, request: CreditNoteCreate, db: Session, current_user):
         try:
             user_id = current_user.id
@@ -135,7 +135,7 @@ class CustomerService:
                     net_vat = detail.net_vat
                 )
                 db.add(new_details)
-            
+
             # create audit trail
             create_trail = AuditTrail(
                 module_id = new_crn.id,
@@ -151,3 +151,37 @@ class CustomerService:
         except Exception as e:
             db.rollback()
             return f"an error occurred: {str(e)}"
+
+    def getAllCreditNotes(self, db: Session):
+        return db.query(
+            CreditNote.id,
+            CreditNote.invoice_id,
+            CreditNote.credit_date,
+            CreditNote.credit_reasons,
+            CreditNote.credit_status,
+            CreditNote.total_credit,
+            CreditNote.total_vat_amount,
+            ).all()
+
+    def getCreditNoteById(self, credit_id: int, db: Session):
+        header = db.query(CreditNote).filter(CreditNote.id == credit_id).first()
+        if not header:
+            return None
+        details = db.query(CreditNoteDetail).filter(CreditNoteDetail.header_id == credit_id).all()
+        results = {
+            "id": header.id,
+            "invoice_id": header.invoice_id,
+            "credit_date": header.credit_date,
+            "credit_reasons": header.credit_reasons,
+            "credit_status": header.credit_status,
+            "total_credit": header.total_credit,
+            "total_vat_amount": header.total_vat_amount,
+            "credit_period": header.credit_period,
+            "reject_reasons": header.reject_reasons,
+            "created_on": header.created_on,
+            "created_by": header.created_by,
+            "action_on": header.action_on,
+            "action_by": header.action_by,
+            "details": details
+        }
+        return results
