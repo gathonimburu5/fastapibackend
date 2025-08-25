@@ -72,3 +72,6 @@ class JournalService:
             "details": details
         }
         return results
+
+    def getSalesJournalRecords(self, db: Session):
+        return db.query(JournalHeader).filter(JournalHeader.transaction_form == "SL").all()
