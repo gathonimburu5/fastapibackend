@@ -1,6 +1,5 @@
 from sqlalchemy import Column, String, Integer, Float, DateTime
 from application.config import Base
-from datetime import datetime
 
 class CreditNote(Base):
     __tablename__ = 'credit_note'
@@ -14,9 +13,9 @@ class CreditNote(Base):
     total_vat_amount = Column(Float, nullable=False, default=0.00)
     credit_period = Column(String, nullable=False)
     reject_reasons = Column(String, nullable=True)
-    created_on = Column(datetime, nullable=False)
+    created_on = Column(DateTime, nullable=False)
     created_by = Column(Integer, nullable=False)
-    action_on = Column(datetime, nullable=False)
+    action_on = Column(DateTime, nullable=False)
     action_by = Column(Integer, nullable=False)
 
 class CreditNoteDetail(Base):
