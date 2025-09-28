@@ -9,7 +9,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Employee Backend API",
     description="Backend API for managing employee data",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/"
 )
 
 app.add_middleware(
