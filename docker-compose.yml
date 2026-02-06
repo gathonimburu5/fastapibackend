@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  employee-backend:
+    container_name: employee-backend
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_DEBUG=1
+    volumes:
+      - .:/employee
+    command: uvicorn application.main:app --host=0.0.0.0 --port=8000 --reload
+
+  employee-database:
+    image: postgres:15
+    container_name: employee-database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=@Paulmburu5
+      - POSTGRES_DB=fastapi_backend_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - employee_data:/var/lib/postgresql/data
+
+  employee-adminer:
+    image: adminer
+    container_name: employee-adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  employee_data:

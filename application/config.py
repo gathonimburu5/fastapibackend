@@ -15,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 # Database configuration
 DB_USERNAME = "postgres"
 DB_PASSWORD = quote(os.getenv("DATABASE_PASSWORD"))
-POSTGRES_URL = "127.0.0.1"
+POSTGRES_URL = "employee-database"
 POSTGRES_DB = os.getenv("DATABASE_NAME")
 POSTGRES_PORT = 5432
 DB_URL = 'postgresql://{user}:{pswd}@{url}:{port}/{db}?application_name=skoteApp'.format(user=DB_USERNAME, pswd=DB_PASSWORD, url=POSTGRES_URL, port=POSTGRES_PORT, db=POSTGRES_DB)

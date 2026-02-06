@@ -3,6 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from application.config import Base, engine
 from application.utility.token import get_current_user
 
+# Import all models to register them with Base
+from application.models.user_model import Signup
+from application.models.employee_model import Employee, Customer
+from application.models.product_model import Product, Category, MeasurementUnit, Warehouse, Tax, RequestHeader, RequestDetail
+from application.models.journal_model import JournalHeader, JournalDetails
+from application.models.credit_note_model import CreditNote, CreditNoteDetail
+from application.models.trail_model import AuditTrail, ProductMovement, WarehouseMovement
+
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
